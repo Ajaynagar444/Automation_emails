@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>AI Email Sender - Medro Hi-Tech AI Solution</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2d3748;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .dashboard-header h1 {
+            color: #495057;
+            font-weight: 300;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .dashboard-header p {
+            color: #6c757d;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .section-title i {
+            margin-right: 0.5rem;
+            color: #667eea;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            outline: none;
+        }
+
+        .form-control::placeholder, textarea::placeholder {
+            color: #6c757d;
+        }
+
+        .btn-send, .btn-reset, .btn-logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-send:hover, .btn-reset:hover, .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-send:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .file-drop {
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-drop.drag-over {
+            background: #e7f3ff;
+            border-color: #764ba2;
+        }
+
+        .file-drop i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .file-drop span {
+            display: block;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .csv-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            background: #f8f9fa;
+            font-size: 0.9rem;
+            color: #495057;
+            position: relative;
+        }
+
+        .csv-preview strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .csv-preview-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .csv-preview-toggle:hover {
+            color: #764ba2;
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-bar {
+            height: 1rem;
+            background: #edf2f7;
+            border-radius: 6px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease-in-out;
+        }
+
+        .progress-container p {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0;
+            }
+
+            .dashboard-card {
+                margin: 0 1rem 1rem 1rem;
+                padding: 1.5rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .dashboard-header p {
+                font-size: 0.9rem;
+            }
+
+            .form-control, .form-select {
+                font-size: 0.9rem;
+            }
+
+            .btn-send, .btn-reset, .btn-logout {
+                font-size: 1rem;
+                padding: 0.75rem 1.5rem;
+            }
+
+            .file-drop i {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>Medro Hi-Tech AI Solution
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link btn-logout" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="container mt-3">
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'warning' }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <!-- File Upload Error Area -->
+            <div id="file-error" class="alert alert-danger alert-dismissible fade d-none fade-in" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="file-error-message"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <!-- Dashboard Card -->
+            <div class="dashboard-card">
+                <div class="dashboard-header">
+                    <h1><i class="fas fa-envelope-open-text me-2"></i>AI Email Sender</h1>
+                    <p>Power your outreach with AI precision</p>
+                </div>
+
+                <form id="emailForm" method="POST" enctype="multipart/form-data">
+                    <!-- SMTP Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="section-title">
+                                <i class="fas fa-server"></i>SMTP Configuration
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="smtp_server" class="form-label">SMTP Server <span class="required-field">*</span></label>
+                            <input type="text" class="form-control" id="smtp_server" name="smtp_server" placeholder="smtp.gmail.com" required aria-label="SMTP Server">
+                            <div class="form-text">e.g., smtp.gmail.com for Gmail, smtp-mail.outlook.com for Outlook</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="smtp_port" class="form-label">SMTP Port <span class="required-field">*</span></label>
+                            <input type="number" class="form-control" id="smtp_port" name="smtp_port" placeholder="465" value="465" required aria-label="SMTP Port">
+                            <div class="form-text">SSL: 465, TLS: 587</div>
+                        </div>
+                    </div>
+
+                    <!-- Email Credentials -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="section-title">
+                                <i class="fas fa-key"></i>Email Credentials
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email_address" class="form-label">Your Email <span class="required-field">*</span></label>
+                            <input type="email" class="form-control" id="email_address" name="email_address" placeholder="you@example.com" required aria-label="Sender Email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email_password" class="form-label">App Password <span class="required-field">*</span></label>
+                            <input type="password" class="form-control" id="email_password" name="email_password" required aria-label="App Password">
+                            <div class="form-text">Use an App Password for Gmail, not your regular password</div>
+                        </div>
+                    </div>
+
+                    <!-- Email Content -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="section-title">
+                                <i class="fas fa-edit"></i>Email Content
+                            </h5>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="subject" class="form-label">Subject <span class="required-field">*</span></label>
+                            <input type="text" class="form-control" id="subject" name="subject" placeholder="Welcome!" required aria-label="Email Subject">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="message" class="form-label">Message (use {name} for personalization) <span class="required-field">*</span></label>
+                            <textarea class="form-control" id="message" name="message" rows="6" placeholder="Hello {name}, welcome to our AI platform!" required aria-label="Email Message"></textarea>
+                            <div class="form-text">Use <code>{name}</code> to personalize with recipient names</div>
+                        </div>
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="section-title">
+                                <i class="fas fa-upload"></i>Recipient Data
+                            </h5>
+                        </div>
+                        <div class="col-12">
+                            <label for="csv_file" class="form-label">Upload CSV or Excel (with 'name' and 'email' columns) <span class="required-field">*</span></label>
+                            <div id="drop-area" class="file-drop">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <input type="file" class="form-control d-none" id="csv_file" name="csv_file" accept=".csv,.xlsx,.xls" required aria-label="Upload CSV or Excel file">
+                                <span id="file-label">Click to upload or drag and drop a CSV or Excel file (max 5MB)</span>
+                                <span id="file-name"></span>
+                            </div>
+                            <p id="csv_file_error" class="error-text hidden"></p>
+                            <div id="csv-preview" class="csv-preview hidden">
+                                <strong>File Content Preview</strong>
+                                <button type="button" class="csv-preview-toggle" onclick="toggleCsvPreview()">Hide</button>
+                                <div id="csv-content"></div>
+                            </div>
+                            <div class="form-text mt-2">File must contain 'name' and 'email' columns (case-insensitive). Supported formats: CSV, XLSX, XLS.</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container hidden" id="progress-container">
+                        <p>Sending Progress:</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <p id="progress-text" class="form-text mt-1">0% Complete</p>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <button type="submit" class="btn-send"><i class="fas fa-paper-plane me-2"></i>Send Emails</button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <button type="button" class="btn-reset" id="reset-btn"><i class="fas fa-undo me-2"></i>Reset Form</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <footer>
+                <p>© 2025 Medro Hi-Tech AI Solution • All rights reserved</p>
+            </footer>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form Validation
+        const inputs = {
+            smtp_server: {
+                element: document.getElementById('smtp_server'),
+                error: document.getElementById('smtp_server_error') || document.createElement('p'),
+                validate: (value) => value.trim() ? '' : 'SMTP server cannot be empty',
+            },
+            smtp_port: {
+                element: document.getElementById('smtp_port'),
+                error: document.getElementById('smtp_port_error') || document.createElement('p'),
+                validate: (value) => /^\d+$/.test(value) ? '' : 'SMTP port must be a valid number',
+            },
+            email_address: {
+                element: document.getElementById('email_address'),
+                error: document.getElementById('email_address_error') || document.createElement('p'),
+                validate: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? '' : 'Please enter a valid email address',
+            },
+            email_password: {
+                element: document.getElementById('email_password'),
+                error: document.getElementById('email_password_error') || document.createElement('p'),
+                validate: (value) => value.length >= 6 ? '' : 'Password must be at least 6 characters long',
+            },
+            subject: {
+                element: document.getElementById('subject'),
+                error: document.getElementById('subject_error') || document.createElement('p'),
+                validate: (value) => value.trim() ? '' : 'Subject cannot be empty',
+            },
+        };
+
+        Object.values(inputs).forEach(({ element, error, validate }) => {
+            error.classList.add('error-text', 'hidden');
+            element.parentElement.appendChild(error);
+            element.addEventListener('input', () => {
+                const errorMessage = validate(element.value);
+                error.textContent = errorMessage;
+                error.classList.toggle('hidden', !errorMessage);
+                element.classList.toggle('is-invalid', !!errorMessage);
+                element.classList.toggle('is-valid', !errorMessage && element.value);
+                if (errorMessage) element.classList.add('error-shake');
+                setTimeout(() => element.classList.remove('error-shake'), 300);
+            });
+        });
+
+        // File Upload Handling
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('csv_file');
+        const fileLabel = document.getElementById('file-label');
+        const fileName = document.getElementById('file-name');
+        const csvPreview = document.getElementById('csv-preview');
+        const csvContent = document.getElementById('csv-content');
+        const fileError = document.getElementById('csv_file_error');
+        let currentFile = null;
+
+        dropArea.addEventListener('click', () => fileInput.click());
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('drag-over');
+        });
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('drag-over');
+        });
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                validateFile();
+            }
+        });
+        fileInput.addEventListener('change', validateFile);
+
+        function validateFile() {
+            if (fileInput.files.length) {
+                const file = fileInput.files[0];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                const validExtensions = ['.csv', '.xlsx', '.xls'];
+                const fileExt = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+
+                if (file.size > maxSize) {
+                    fileError.textContent = 'File size exceeds 5MB limit';
+                    fileError.classList.remove('hidden');
+                    dropArea.classList.add('error-shake');
+                    setTimeout(() => dropArea.classList.remove('error-shake'), 300);
+                    fileInput.value = '';
+                    fileName.textContent = currentFile ? currentFile.name : '';
+                    fileLabel.classList.toggle('hidden', !!currentFile);
+                    csvPreview.classList.toggle('hidden', !currentFile);
+                } else if (!validExtensions.includes(fileExt)) {
+                    fileError.textContent = 'Please upload a CSV or Excel file (.csv, .xlsx, .xls)';
+                    fileError.classList.remove('hidden');
+                    dropArea.classList.add('error-shake');
+                    setTimeout(() => dropArea.classList.remove('error-shake'), 300);
+                    fileInput.value = '';
+                    fileName.textContent = currentFile ? currentFile.name : '';
+                    fileLabel.classList.toggle('hidden', !!currentFile);
+                    csvPreview.classList.toggle('hidden', !currentFile);
+                } else {
+                    fileError.classList.add('hidden');
+                    currentFile = file;
+                    fileName.textContent = file.name;
+                    fileLabel.classList.add('hidden');
+                    previewFile(file);
+                }
+            } else if (!currentFile) {
+                fileError.textContent = 'Please upload a CSV or Excel file';
+                fileError.classList.remove('hidden');
+                fileName.textContent = '';
+                fileLabel.classList.remove('hidden');
+                csvPreview.classList.add('hidden');
+            }
+        }
+
+        function previewFile(file) {
+            const fileExt = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+            const reader = new FileReader();
+
+            if (fileExt === '.csv') {
+                reader.onload = (e) => {
+                    const text = e.target.result;
+                    const rows = text.split('\n').slice(0, 3);
+                    const html = rows.map(row => `<div>${row.split(',').join(' | ')}</div>`).join('');
+                    csvContent.innerHTML = html;
+                    csvPreview.classList.remove('hidden');
+                    csvPreview.classList.add('fade-in');
+                    setTimeout(() => csvPreview.classList.remove('fade-in'), 500);
+                };
+                reader.readAsText(file);
+            } else if (fileExt === '.xlsx' || fileExt === '.xls') {
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheet];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 }).slice(0, 3);
+                    const html = rows.map(row => `<div>${row.join(' | ')}</div>`).join('');
+                    csvContent.innerHTML = html;
+                    csvPreview.classList.remove('hidden');
+                    csvPreview.classList.add('fade-in');
+                    setTimeout(() => csvPreview.classList.remove('fade-in'), 500);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        function toggleCsvPreview() {
+            const toggleBtn = document.querySelector('.csv-preview-toggle');
+            const isHidden = csvPreview.classList.contains('hidden');
+            csvPreview.classList.toggle('hidden', !isHidden);
+            toggleBtn.textContent = isHidden ? 'Hide' : 'Show';
+        }
+
+        // Form Submission
+        const form = document.getElementById('emailForm');
+        const submitBtn = document.querySelector('.btn-send');
+        const progressContainer = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const messageInput = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let hasError = false;
+
+            // Client-side validation
+            Object.values(inputs).forEach(({ element, error, validate }) => {
+                const errorMessage = validate(element.value);
+                error.textContent = errorMessage;
+                error.classList.toggle('hidden', !errorMessage);
+                element.classList.toggle('is-invalid', !!errorMessage);
+                element.classList.toggle('is-valid', !errorMessage && element.value);
+                if (errorMessage) {
+                    element.classList.add('error-shake');
+                    setTimeout(() => element.classList.remove('error-shake'), 300);
+                    hasError = true;
+                }
+            });
+
+            if (!currentFile) {
+                fileError.textContent = 'Please upload a valid CSV or Excel file';
+                fileError.classList.remove('hidden');
+                dropArea.classList.add('error-shake');
+                setTimeout(() => dropArea.classList.remove('error-shake'), 300);
+                hasError = true;
+            } else {
+                fileError.classList.add('hidden');
+            }
+
+            if (!messageInput.value.includes('{name}')) {
+                const warn = confirm("⚠️ Your message doesn't contain the {name} placeholder. Continue anyway?");
+                if (!warn) hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Prepare form data
+            const formData = new FormData(form);
+            if (currentFile) {
+                formData.set('csv_file', currentFile); // Ensure the file is included
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+            progressContainer.classList.remove('hidden');
+            progressFill.style.width = '0%';
+            progressText.textContent = '0% Complete';
+
+            // Timeout for fetch request (30 seconds)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+            try {
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    progressFill.style.width = `${progress}%`;
+                    progressText.textContent = `${progress}% Complete`;
+                    if (progress >= 100) clearInterval(progressInterval);
+                }, 300);
+
+                // Send form data to Flask
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal
+                });
+
+                clearInterval(progressInterval);
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 100));
+                progressFill.style.width = '100%';
+                progressText.textContent = '100% Complete';
+                window.location.reload();
+            } catch (error) {
+                clearInterval(progressInterval);
+                clearTimeout(timeoutId);
+                progressContainer.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Emails';
+                const flashDiv = document.createElement('div');
+                flashDiv.className = 'alert alert-danger alert-dismissible fade show fade-in';
+                flashDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${error.name === 'AbortError' ? 'Request timed out. Please try again.' : `Error sending emails: ${error.message}`}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.querySelector('.container').insertBefore(flashDiv, form);
+                setTimeout(() => flashDiv.remove(), 5000);
+            } finally {
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Emails';
+                }, 1000);
+            }
+        });
+
+        // Reset Form
+        const resetBtn = document.getElementById('reset-btn');
+        resetBtn.addEventListener('click', () => {
+            form.reset();
+            fileInput.value = '';
+            currentFile = null;
+            fileName.textContent = '';
+            fileLabel.classList.remove('hidden');
+            fileError.classList.add('hidden');
+            csvPreview.classList.add('hidden');
+            Object.values(inputs).forEach(({ element, error }) => {
+                error.classList.add('hidden');
+                element.classList.remove('is-invalid', 'is-valid');
+            });
+        });
+    </script>
+</body>
+</html>
